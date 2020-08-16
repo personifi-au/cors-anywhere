@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+#
+# Build, pushes cors-anywhere image with tag. If no arguments are given,
+# 'latest' tag is used.
+#
+# Example:
+# # Build image with tag 'latest'
+# ./bin/docker build
+# # Build image with tag '0.0.1'
+# ./bin/docker build 0.0.1
+# # Pushes image with tag '0.0.1'
+# ./bin/docker push 0.0.1
+
+set -euo pipefail
+log(){ echo "--- $*"; }
+
+REPO=gcr.io/flux-production/cors-anywhere
+build() {
+    TAG="${1:-latest}"
+    IMAGE="${REPO}:${TAG}"
+    log "Building image: ${IMAGE}" 
+    docker build -t "${IMAGE}" .
+}
+
+push() {
+    TAG="${1:-latest}"
+    IMAGE="${REPO}:${TAG}"
+    log "Pushing image: ${IMAGE}" 
+    docker push "${IMAGE}"
+}
+
+case "${1}" in
+    push) push "${2:-latest}";;
+    build) build "${2-latest}";;
+    *) echo "Usage: $0 build|push [tag]";;
+esac
+
